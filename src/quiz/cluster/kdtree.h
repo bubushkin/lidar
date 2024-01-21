@@ -48,12 +48,37 @@ struct KdTree
 	}
 
 	// return a list of point ids in the tree that are within distance of target
-	std::vector<int> search(std::vector<float> target, float distanceTol)
-	{
+	void rsearch(std::vector<int> &ids, Node *node, int depth, std::vector<float>target, float distanceTol){
+
+		if(node != NULL){
+			//std::cout << is_inside(node->point, target, distanceTol) << std::endl;
+			if(is_inside(node->point, target, distanceTol)){
+				std::cout << distance(node->point, target) << std::endl;
+				if(distance(node->point, target) <= distanceTol)
+				ids.push_back(node->id);
+			}
+			if((target[depth % 2] - distanceTol) < node->point[depth % 2]){
+				rsearch(ids, node->left, depth + 1, target, distanceTol);
+			}
+			if((target[depth % 2] + distanceTol) > node->point[depth % 2]){
+				rsearch(ids, node->right, depth + 1, target, distanceTol);
+			}
+
+		}
+
+	}
+
+	// return a list of point ids in the tree that are within distance of target
+	std::vector<int> search(std::vector<float> target, float distanceTol) {
 		std::vector<int> ids;
+
+		rsearch(ids, root, 0, target, distanceTol);
+		//std::cout << ids.size() << std::endl;
+
+		
 		return ids;
 	}
-	
+
 
 };
 
