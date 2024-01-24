@@ -69,11 +69,17 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
         renderBox(viewer, box, clusterId);
         ++clusterId;
     }
-
     delete ppc;
-
-  
 }
+
+void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer){
+    ProcessPointClouds<pcl::PointXYZI> *ppc = new ProcessPointClouds<pcl::PointXYZI>();
+    pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloud = ppc->loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
+    auto filteredCloud = ppc->FilterCloud(inputCloud, 0.25f, Eigen::Vector4f(-10.0, -6.0, -4.0, 1), Eigen::Vector4f(10.0, 6.0, 4, 1));
+
+    renderPointCloud(viewer, filteredCloud, "filteredCloud");
+}
+
 
 
 //setAngle: SWITCH CAMERA ANGLE {XY, TopDown, Side, FPS}
