@@ -32,26 +32,30 @@ typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(ty
     typename pcl::PointCloud<PointT>::Ptr croppedCloud{new pcl::PointCloud<PointT>()};
     std::vector<int> ridx;
 
+
     pcl::VoxelGrid<PointT> vox;
     vox.setInputCloud(cloud);
     vox.setLeafSize(filterRes, filterRes, filterRes);
     vox.filter(*filteredCloud);
+    std::cout << "original: " << cloud->size() << std::endl;
+    std::cout << "filtered: " << filteredCloud->size() << std::endl;
 
-    pcl::CropBox<PointT> cropBox;
+    pcl::CropBox<PointT> visualRegion(true);
 
-    cropBox.setInputCloud(filteredCloud);
-    cropBox.setMin(minPoint);
-    cropBox.setMax(maxPoint);
-    cropBox.filter(*croppedCloud);
+    visualRegion.setMin(minPoint);
+    visualRegion.setMax(maxPoint);
+    visualRegion.setInputCloud(filteredCloud);
+    visualRegion.filter(*croppedCloud);
+    std::cout <<"cropped:" << croppedCloud->size() << std::endl;
 
-    pcl::CropBox<PointT> roofBox{true};
-    roofBox.setInputCloud(filteredCloud);
-    roofBox.setMin(this->minRoof);
-    roofBox.setMax(this->maxRoof);
+    pcl::CropBox<PointT> roofBox(true);
+    roofBox.setMin(Eigen::Vector4f(-1.5, -1.7, -1, 1));
+    roofBox.setMax(Eigen::Vector4f(2.6, 1.7, -0.4, 1));
+    roofBox.setInputCloud(croppedCloud);
     roofBox.filter(ridx);
 
-    pcl::PointIndices::Ptr inliers{new pcl::PointIndices()};
-    for(auto point : ridx){
+    pcl::PointIndices::Ptr inliers{new pcl::PointIndices};
+    for(int point : ridx){
         inliers->indices.push_back(point);
     }
 
@@ -65,7 +69,7 @@ typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(ty
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
     std::cout << "filtering took " << elapsedTime.count() << " milliseconds" << std::endl;
 
-    return cloud;
+    return croppedCloud;
 
 }
 
