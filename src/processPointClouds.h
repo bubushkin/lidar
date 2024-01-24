@@ -45,6 +45,10 @@ public:
     typename pcl::PointCloud<PointT>::Ptr loadPcd(std::string file);
 
     std::vector<boost::filesystem::path> streamPcd(std::string dataPath);
+
+private:
+    Eigen::Vector4f minRoof{-1.5, -1.7, -1, 1};
+    Eigen::Vector4f maxRoof{2.6, 1.7, -.4, 1};
   
 };
 #endif /* PROCESSPOINTCLOUDS_H_ */
